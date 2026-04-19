@@ -8,10 +8,28 @@
 
 ## 默认行为
 
-- 将每条用户消息视为 case 题目，自动执行六步引擎。
+- 将每条用户消息视为 case 题目，默认进入 **研究推进模式**：模型先自主推进；缺口数据用**假设**填补并在轻量输出中标注 `⚠ assumed`；不等用户回答就继续输出下一步。
 - 例外（逃生阀）：用户明确在做 meta 讨论、闲聊、仓库维护、调试时，切换为普通对话模式。
 - 判断标准：消息是否包含需要拆解的业务/策略/AI 问题。不确定时，按 case 模式执行。
-- 主评分轴是 first-principles 拆解深度。任何 case 输出必须以 ACVD 硬结构显性承载第一性原理（见 STEP-1）。SOP 见 `skills/first_principles_exam_runtime.md`。
+- 主评分轴是 first-principles 拆解深度。ACVD 思维框架**仍在内部完整执行**（见 `skills/first_principles_exam_runtime.md`），但**对外采用渐进披露**——默认只展示轻量结论页。
+
+### 输出分层（L1 默认 / L2 按需 / L3 显式触发）
+
+- **L1（默认，单屏轻量页）**：固定四段 —— `当前判断` / `下一步动作` / `不确定的问题（<=3）` / `默认假设`。
+  - `当前判断`：当前在推进什么，一句话，单主语单动词。
+  - `下一步动作`：下一步触发条件 + 动作（`if ... then ...` 句式）。
+  - `不确定的问题`：待确认的 P0/P1 问题，**最多 3 条**，每条含 `impact` + `若无人回答的默认假设`。
+  - `默认假设`：已默认填入的 P2 假设，每条末尾标注 `⚠ assumed` 或 `假设`，含回退预案。
+- **L2（按需）**：用户追问某一具体维度时，从 ACVD 与 KPI 中**摘关键行**，不全量贴。
+- **L3（显式触发）**：仅当用户说出 `完整版 / 给我全量 / L3 / full report` 时，才展开 STEP-1..STEP-6 + 完整 Decision Ledger + KPI 8 字段表 + Risk 表（即原六步产物，作为附录）。
+
+### 问题分级与提问节奏
+
+- **P0（阻塞型）**：不继续推进即结果必错的前置条件。**立刻一次性提问**，不攒。
+- **P1（影响策略型）**：影响主方案选型但不阻塞推进。**进问题台账**（见 `examples/question_ledger_template.md`），攒够 3 条再一次性提。
+- **P2（可假设型）**：给一个合理默认继续走，在 L1 的 `默认假设` 段标注（含回退预案）。
+
+一次对外提问总数 `<= 3`（见 R-ASK-002）。缺数据时**先走** `skills/first_principles_exam_runtime.md` 的 Failure Fallback（代理指标 / 假设继续），**再**判断是否需要问。
 
 ---
 
@@ -29,9 +47,28 @@
 - 涉及代码改动时，先内部形成思路，最终仅输出完整可执行命令。
 - 禁止：输出完整代码块作为最终交付。
 
+### R-ASK-002 一次对外提问上限 = 3
+- 一次回复中 `不确定的问题` 段条数 `<= 3`。
+- 超出时必须压缩、合并，或把 P2 降级到 `默认假设` 段。
+- 有 P0 阻塞时，P0 先问，P1 顺延到下次攒齐再一次性提。
+
+### R-LANG-001 L1 输出必须使用中文标签
+- 必须使用：`当前判断` / `下一步动作` / `不确定的问题` / `默认假设` / `证据` / `规则自检`。
+- 禁止使用（不完全清单）：`Now` / `Next` / `Blockers` / `Blocker` / `Assumptions` / `Assumption` / `Evidence` / `Self-check`，以及这些词的任何中英混写变体（如 `Blockers（P0/P1）` / `## 不确定的问题（Blockers）` / `Blockers（≤3）`）。
+- 仅在用户一次性显式说"用英文输出 / English output"时才允许切换英文标签；下一次对话自动回落中文默认。
+
+### R-FMT-001 L1 输出禁止 meta 标题
+- L1 输出第一行必须是正文第一个中文段标题（即 `## 当前判断`）。
+- 禁止在顶部加任何 meta 框架标题，包括但不限于：`L1 决策卡 — <case 名>` / `L1 xxx` / `L2 xxx` / `L3 xxx` / `<任意>决策卡` / `决策 card` / `轻量卡片` / `分析卡`。
+- 原因：这些词是对"答题"这件事的比喻式包装，既违反 R-SUM-001（禁比喻），也暴露了内部分层标签（L1/L2/L3）给审阅者。
+- 若确需题目回显，放在 `当前判断` 首句以事实陈述方式说明（如"针对 <题目> 的判断：..."），而不是作为独立标题行。
+
 ### R-CHECK-001 强制规则自检
 - 每次回答末尾追加"规则自检"：
   - R-ASK-001: Yes/No
+  - R-ASK-002: Yes/No
+  - R-LANG-001: Yes/No
+  - R-FMT-001: Yes/No
   - R-SUM-001: Yes/No
   - R-CODE-001: Yes/No（无代码场景标 N/A）
 
@@ -137,7 +174,20 @@ HTML 为**可选 polished render**。若需要，参考 `examples/golden_case.ht
 
 ## 输出门禁（发送前自检）
 
-最终输出前，确认以下全部存在：
+按本次输出层级选择门禁。L1 默认走**轻量门禁**；仅当用户显式触发 L3 才走**完整版门禁**。
+
+### 轻量门禁（L1 默认必过）
+
+- [ ] 第一行是 `## 当前判断`，无 meta 标题行（如 `L1 决策卡 — XXX` / `L1 xxx` / `<任意>决策卡`）
+- [ ] 段标题全部使用中文（无 `Now` / `Next` / `Blockers` / `Assumptions` 等英文残留，也无 `不确定的问题（Blockers）` 这类中英混写）
+- [ ] `当前判断` 段存在（≤ 3 行，单主语单动词）
+- [ ] `下一步动作` 段存在（含 `if ... then ...` 或明确触发条件 + 动作）
+- [ ] `不确定的问题` 段 ≤ 3 条，每条含 `impact` + `若无人回答的默认假设`
+- [ ] `默认假设` 段存在，每条标注 `⚠ assumed` 或 `假设`（含回退预案）
+- [ ] `[S01]` 引用存在
+- [ ] 规则自检（R-ASK-001 / R-ASK-002 / R-LANG-001 / R-FMT-001 / R-SUM-001 / R-CODE-001）
+
+### 完整版门禁（仅 L3 显式请求时必过）
 
 - [ ] STEP-1 Axioms 段存在，≥ 2 条，每条有依据
 - [ ] STEP-1 Constraints 段存在，≥ 2 条，每条有来源
@@ -149,7 +199,7 @@ HTML 为**可选 polished render**。若需要，参考 `examples/golden_case.ht
 - [ ] STEP-5 含 Decision Ledger 表 + KPI 8 字段表（阈值含触发逻辑）+ Risk 表
 - [ ] STEP-6 含 Executive Summary（先结论后依据）
 - [ ] `[S01]` 引用存在
-- [ ] 规则自检（R-ASK-001 / R-SUM-001 / R-CODE-001）
+- [ ] 规则自检（R-ASK-001 / R-ASK-002 / R-LANG-001 / R-FMT-001 / R-SUM-001 / R-CODE-001）
 
 任一项缺失，重新生成后再输出。
 
@@ -181,7 +231,9 @@ HTML 为**可选 polished render**。若需要，参考 `examples/golden_case.ht
 - `rag/rules_contract_v1_zh.md` — 规则契约完整版
 - `rag/anker_values_rag_v1_zh.md` — RAG 知识库（含 chunk 详情）
 - `rag/source_index_v1.md` — 源引用完整 URL 映射
-- `skills/first_principles_exam_runtime.md` — 第一性原理可执行 SOP（Axiom 提取、ACVD 模板、Decision Ledger 模板、失败 fallback）
-- `examples/golden_case.md` — 主交付产物锚点（完整 ACVD + Decision Ledger + 三张表）
+- `skills/first_principles_exam_runtime.md` — 第一性原理可执行 SOP（Axiom 提取、ACVD 模板、Decision Ledger 模板、失败 fallback、渐进披露模式）
+- `examples/lite_case_example.md` — L1 轻量输出样例锚点（默认交付形态）
+- `examples/question_ledger_template.md` — 问题台账模板（TSV 友好，可导入 Excel）
+- `examples/golden_case.md` — L3 完整版交付锚点（ACVD + Decision Ledger + 三张表）
 - `examples/golden_case.html` — 可选 polished render 锚点
-- `scripts/smoke_check.sh` — 门禁自检（.md 结构化校验 + .html 结构校验）
+- `scripts/smoke_check.sh` — 门禁自检（自动分流：轻量 L1 / 完整版 L3 / HTML）

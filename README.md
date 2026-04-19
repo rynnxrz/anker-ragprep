@@ -1,11 +1,12 @@
 # Anker AI 飞行员试炼 — Claude Code Runtime
 
-打开即用的仓库。核心是**第一性原理 ACVD 拆解 + Decision Ledger**。考试不做现场讲解，产物即交付。
+打开即用的仓库。核心是**第一性原理 ACVD 拆解 + Decision Ledger**。考试不做现场讲解，产物即交付。默认先给轻量版，按需展开完整版。
 
 ## What
 
 - Claude Code 运行时仓库。
-- 主交付：`.md` 展示产物（含完整 ACVD + Decision Ledger + 三张表）。
+- 默认交付：`.md` 轻量输出（`当前判断 / 下一步动作 / 不确定的问题 / 默认假设`）。
+- 按需交付：完整版 `.md`（完整 ACVD + Decision Ledger + 三张表）。
 - 辅助（可选）：polished `.html` 渲染。
 - 核心评分轴：第一性原理拆解深度。
 
@@ -13,10 +14,22 @@
 
 1. 在此目录打开 Claude Code。
 2. 直接输入 case 题目。
-3. Claude 按 STEP-1..STEP-6 自动执行，输出落在 `output/case_xxx.md`。
-4. 如需 polished 版本，再由同一 case 生成 `output/case_xxx.html`（可选）。
+3. Claude 默认输出轻量版到 `output/case_xxx.md`（研究推进模式）。
+4. 用户明确要求 `完整版 / L3` 时，再展开 STEP-1..STEP-6。
+5. 如需 polished 版本，再由同一 case 生成 `output/case_xxx.html`（可选）。
 
-## Output 结构（主交付 .md）
+## Output 结构
+
+### 默认（L1 轻量输出）
+
+```
+当前判断
+下一步动作
+不确定的问题（<=3）
+默认假设
+```
+
+### 按需（L3 完整版 .md）
 
 ```
 STEP-1 第一性原理拆解
