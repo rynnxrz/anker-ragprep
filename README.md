@@ -1,31 +1,23 @@
-# Anker Prep RAG Repository
+# Anker AI 飞行员试炼 — Prep Repo
 
-## What this repo enforces
-- Rule-first answering behavior for Claude Code.
-- Evidence-backed retrieval for Anker values and test preparation.
+Claude Code 运行时仓库。打开即用，无需配置。
 
-## Files
-- `CLAUDE.md`: hard execution order and output gate.
-- `rag/rules_contract_v1_zh.md`: machine-checkable style/format rules.
-- `rag/anker_values_rag_v1_zh.md`: chunked RAG knowledge base.
-- `rag/source_index_v1.md`: citation registry `[Sxx] -> URL`.
+## 使用方式
 
-## Start Prompt (copy/paste)
-```text
-请严格按仓库规则执行本次任务：
-1) 先读取 CLAUDE.md
-2) 再读取 rag/rules_contract_v1_zh.md
-3) 再读取 rag/anker_values_rag_v1_zh.md 和 rag/source_index_v1.md
-4) 回答必须满足：
-   - 提问题：只写“问题位置 + 问题本身”，不总结、不比喻
-   - 总结：不使用比喻，不用比喻式重写
-   - 若涉及代码修改：先完成思路，再只输出完整可执行命令，不输出完整代码
-5) 最后追加“规则自检”并逐条标注是否违反 R-ASK-001 / R-SUM-001 / R-CODE-001
-现在任务是：<把你的具体任务写在这里>
+1. 在此目录打开 Claude Code
+2. 直接输入 case 题目
+3. Claude 自动按六步引擎 + 规则契约执行
+
+## 目录结构
+
+```
+CLAUDE.md              ← 运行时配置（自动加载）
+rag/                   ← 参考材料（规则/知识库/源索引）
+examples/              ← 满分输出示例
+scripts/               ← 输出检查脚本
+output/                ← 生成的 case 答案存放处
 ```
 
-## Validation Checklist
-- Rules loaded before retrieval: Yes
-- Output contains no metaphor in summary: Yes
-- Code-change requests produce commands only: Yes
-- Final answer includes rule self-check: Yes
+## Fallback
+
+如果 Claude 未自动按引擎执行，粘贴 `CLAUDE.md` 底部的 fallback 模板。

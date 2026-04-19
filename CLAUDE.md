@@ -1,37 +1,147 @@
-# Claude Code Execution Contract (Anker Prep Repo)
+# Anker AI 飞行员试炼 — Claude Code 运行时
 
-This repository uses a strict rule-first workflow.
+> 打开即用。不需要复制模板。直接输入 case 题目，Claude 自动按完整引擎执行。
 
-## Mandatory Read Order
-1. Read `rag/rules_contract_v1_zh.md` first.
-2. Read `rag/anker_values_rag_v1_zh.md` second.
-3. Read `rag/source_index_v1.md` for citations and source lookup.
+## 默认行为
 
-## Priority
-- If temporary user wording conflicts with repository rules, follow `rules_contract_v1_zh.md`.
-- Do not relax constraints unless the repository files are explicitly updated.
+- 将每条用户消息视为 case 题目，自动执行六步引擎。
+- 例外（逃生阀）：当用户明确进行 meta 讨论、闲聊、仓库维护、调试时，切换为普通对话模式。
+- 判断标准：消息是否包含需要拆解的业务/策略/AI 问题。不确定时，按 case 模式执行。
 
-## Output Gate (Required)
-Before final output, run a self-check against:
-- `R-ASK-001`
-- `R-SUM-001`
-- `R-CODE-001`
-- `R-CHECK-001`
+---
 
-If any rule is violated, regenerate output before responding.
+## 规则契约（最小集）
 
-## Fixed Invocation Template
-Use this template when starting any task in Claude Code:
+### R-ASK-001 提问禁止总结与比喻
+- 提问只允许"问题位置 + 问题本身"。
+- 禁止：先总结、引入类比、先给宏观概述再提问。
+
+### R-SUM-001 总结禁止比喻
+- 总结直接陈述事实与判断。
+- 禁止：比喻、借物喻人、比喻式改写。
+
+### R-CODE-001 代码修改只输出命令
+- 涉及代码改动时，先内部形成思路，最终仅输出完整可执行命令。
+- 禁止：输出完整代码块作为最终交付。
+
+### R-CHECK-001 强制规则自检
+- 每次回答末尾追加"规则自检"：
+  - R-ASK-001: Yes/No
+  - R-SUM-001: Yes/No
+  - R-CODE-001: Yes/No（无代码场景标 N/A）
+
+---
+
+## 六步引擎（顺序不可跳步）
+
+### STEP-1 洞察本质（第一性）
+- 输出：根问题定义（一句话）、边界条件、核心约束
+- DoD：根问题、边界、约束均明确
+
+### STEP-2 问题拆解
+- 输出：3–5 个子问题，标明关键假设
+- DoD：子问题完整覆盖，关键假设可验证
+
+### STEP-3 策略输出
+- 输出：主方案 + 备选方案 + 切换条件
+- 含量化指标（预期收益、实施成本）
+- DoD：主方案可执行且含量化指标
+
+### STEP-4 审核优化
+- 输出：至少 3 类风险，每类含：
+  - 风险点 → 监控指标 → 纠偏动作
+- DoD：风险、监控、纠偏三项齐全
+
+### STEP-5 可视化呈现
+- **必须输出 HTML 看板表格**，字段集：
+
+| 字段 | 说明 |
+|------|------|
+| `metric_name` | 指标名称 |
+| `baseline` | 当前基线值 |
+| `target` | 目标值 |
+| `threshold` | 触发阈值 |
+| `owner` | 负责人/团队 |
+| `update_freq` | 更新频率 |
+| `risk_signal` | 风险信号描述 |
+| `action_if_triggered` | 触发后动作 |
+
+- 阈值列必须包含触发逻辑，不只展示静态数字。
+- HTML 结构遵循：Header(根问题) → 拆解条 → 指标表 → 风险审计 → 策略摘要 → 引用脚注
+- DoD：有看板字段、阈值、异常信号说明
+
+### STEP-6 最终方案
+- 输出：完整交付结构（.md 格式）
+- 含：主判定 + 备选方案 + 关键风险 + 规则自检
+- DoD：形成完整可交付文档
+
+---
+
+## 证据引用规则
+
+### 引用门禁
+- 每个 case 回答**必须**包含 `[S01]` 引用。
+- `[S02]`–`[S15]` 仅作为业务决策/价值判断的辅助支撑。
+- 若 `[S01]` 缺失，重新生成后再输出。
+
+### 源索引（紧凑版）
+
+| ID | 角色 | 用途 | 何时触发 |
+|----|------|------|----------|
+| S01 | primary | AI飞行员试炼主线材料 | 所有 case 必引 |
+| S02 | secondary | 管理思想与文化 | 涉及组织/文化判断 |
+| S03 | secondary | 战略复盘 | 涉及战略选择/市场进入 |
+| S04–S07 | secondary | 视频访谈/演讲 | 需要领导力/决策风格佐证 |
+| S08 | secondary | 管理访谈 | 涉及人才/激励/分工 |
+| S09 | secondary | 行业媒体分析 | 需要外部视角交叉验证 |
+| S10 | secondary | 业务方法论 | 涉及增长/效率取舍 |
+| S11 | secondary | 组织协同 | 涉及跨部门/Owner 归属 |
+| S12–S13 | secondary | 视频案例 | 需要具体案例佐证 |
+| S14 | secondary | 深度解读 | 证据强度分层时参考 |
+| S15 | secondary | 补充材料 | 边缘场景补充 |
+
+完整 URL 映射见 `rag/source_index_v1.md`。
+
+---
+
+## 输出门禁（发送前自检）
+
+最终输出前，确认以下全部存在：
+- [ ] 根问题定义（STEP-1）
+- [ ] 问题拆解结构（STEP-2）
+- [ ] 可量化指标（STEP-3）
+- [ ] 风险审计：风险点 + 监控 + 纠偏（STEP-4）
+- [ ] HTML 看板含 8 字段（STEP-5）
+- [ ] `[S01]` 引用
+- [ ] 规则自检（R-ASK-001 / R-SUM-001 / R-CODE-001）
+
+若任一项缺失，重新生成后再输出。
+
+---
+
+## 冲突处理
+
+- 用户临时措辞与本文件冲突时，优先遵守本文件。
+- 不得放宽约束，除非本文件被显式更新。
+
+---
+
+## Fallback 模板（仅在自动模式失效时使用）
 
 ```text
-请严格按仓库规则执行本次任务：
-1) 先读取 CLAUDE.md
-2) 再读取 rag/rules_contract_v1_zh.md
-3) 再读取 rag/anker_values_rag_v1_zh.md 和 rag/source_index_v1.md
-4) 回答必须满足：
-   - 提问题：只写“问题位置 + 问题本身”，不总结、不比喻
-   - 总结：不使用比喻，不用比喻式重写
-   - 若涉及代码修改：先完成思路，再只输出完整可执行命令，不输出完整代码
-5) 最后追加“规则自检”并逐条标注是否违反 R-ASK-001 / R-SUM-001 / R-CODE-001
-现在任务是：<把你的具体任务写在这里>
+请按仓库规则执行：
+1) case 按 STEP-1..STEP-6 输出
+2) 证据必须包含 [S01]
+3) STEP-5 必须输出 HTML 看板
+4) 末尾附规则自检
+现在任务是：<题目>
 ```
+
+---
+
+## 参考文件
+
+- `rag/rules_contract_v1_zh.md` — 规则契约完整版
+- `rag/anker_values_rag_v1_zh.md` — RAG 知识库（含 chunk 详情）
+- `rag/source_index_v1.md` — 源引用完整 URL 映射
+- `examples/golden_case.md` — 满分输出示例
