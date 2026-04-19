@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Golden Case — AI 客服方案选型</title>
+  <style>
+    :root {
+      --fg: #111827;
+      --muted: #4b5563;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --warn: #b91c1c;
+      --ok: #15803d;
+      --bg-soft: #f8fafc;
+    }
+    html, body { margin: 0; padding: 0; background: #fff; color: var(--fg); }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                   "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 32px 28px 64px;
+      font-size: 15px;
+    }
+    header.lede {
+      border-left: 6px solid var(--accent);
+      background: var(--bg-soft);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      border-radius: 4px;
+    }
+    header.lede h1 {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    header.lede p.verdict {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    section { margin: 32px 0; }
+    section > h2 {
+      font-size: 18px;
+      margin: 0 0 12px 0;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--fg);
+      display: inline-block;
+    }
+    .subtitle { color: var(--muted); margin: 4px 0 16px 0; font-size: 14px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    caption {
+      caption-side: top;
+      text-align: left;
+      font-weight: 600;
+      padding: 6px 0 10px 0;
+      color: var(--muted);
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+    thead th { background: #f3f4f6; font-weight: 600; }
+    tbody th { background: var(--bg-soft); font-weight: 600; white-space: nowrap; }
+    td.threshold { color: var(--warn); font-weight: 600; }
+    td.action { color: var(--ok); }
+    ol.tree { padding-left: 20px; }
+    ol.tree > li { margin-bottom: 10px; }
+    ol.tree ul { margin: 4px 0 0 0; padding-left: 18px; color: var(--muted); }
+    footer.wrap {
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      font-size: 14px;
+    }
+    footer.wrap h2 {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 10px 0;
+    }
+    .pitch {
+      background: var(--bg-soft);
+      padding: 16px 20px;
+      border-radius: 6px;
+      line-height: 1.65;
+    }
+    .refs { font-size: 13px; color: var(--muted); margin-top: 14px; }
+    .refs code { color: var(--fg); background: #eef2ff; padding: 1px 6px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 结论一句话 -->
+  <header class="lede">
+    <h1>主判定 · Verdict</h1>
+    <p class="verdict">
+      采用分层部署：Phase 1 AI 接管 Top 5 高频标准件（~40% 工单），Phase 2 扩至 Top 15（~65%）；人工全程兜底，三月节省人力成本 35%，CSAT 守 4.1。
+    </p>
+  </header>
+
+  <!-- 2. 决策树 / 问题拆解 -->
+  <section>
+    <h2>决策树 · 问题拆解</h2>
+    <p class="subtitle">根问题：在成本压缩 30% 的硬约束下，选择 AI 客服落地路径，使 CSAT 不低于现有水平。</p>
+    <ol class="tree">
+      <li>
+        <strong>哪些工单类型可被 AI 处理？</strong>
+        <ul><li>假设：标准化问题占比 ≥ 60%，以工单类目聚类验证</li></ul>
+      </li>
+      <li>
+        <strong>AI 处理质量如何保证？</strong>
+        <ul><li>假设：人工兜底 + 置信度阈值可控制质量下限</li></ul>
+      </li>
+      <li>
+        <strong>团队如何过渡？</strong>
+        <ul><li>假设：现有客服可转为 AI 训练 / 质检 / 高价值工单角色</li></ul>
+      </li>
+      <li>
+        <strong>如何衡量成功？</strong>
+        <ul><li>假设：CSAT、解决率、单件成本三指标可同时、同频追踪</li></ul>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 3. KPI 看板 -->
+  <section>
+    <h2>KPI 看板 · 阈值与触发动作</h2>
+    <p class="subtitle">每项指标均有阈值触发逻辑与具体纠偏动作，可运营、可复盘。</p>
+    <table>
+      <caption>表 1 · Phase 1–2 KPI 看板（8 字段齐全）</caption>
+      <thead>
+        <tr>
+          <th scope="col">metric_name</th>
+          <th scope="col">baseline</th>
+          <th scope="col">target</th>
+          <th scope="col">threshold</th>
+          <th scope="col">owner</th>
+          <th scope="col">update_freq</th>
+          <th scope="col">risk_signal</th>
+          <th scope="col">action_if_triggered</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">AI 解决率</th>
+          <td>0%</td>
+          <td>65%</td>
+          <td class="threshold">&lt; 50% at Week 4</td>
+          <td>AI 产品负责人</td>
+          <td>每周</td>
+          <td>连续 2 周低于 50%</td>
+          <td class="action">启动备选方案评估（外包 + AI 辅助）</td>
+        </tr>
+        <tr>
+          <th scope="row">CSAT</th>
+          <td>4.2</td>
+          <td>≥ 4.1</td>
+          <td class="threshold">&lt; 3.8 单日</td>
+          <td>客服总监</td>
+          <td>每日</td>
+          <td>单日 CSAT &lt; 3.8</td>
+          <td class="action">暂停 AI 自动回复，全量转人工 24h</td>
+        </tr>
+        <tr>
+          <th scope="row">客服人力成本</th>
+          <td>300 万 / 年</td>
+          <td>≤ 200 万 / 年</td>
+          <td class="threshold">&gt; 250 万 / 年 at Month 3</td>
+          <td>财务 BP</td>
+          <td>每月</td>
+          <td>Phase 2 后成本未下降</td>
+          <td class="action">审计 AI 覆盖率与人工兜底比例，重排班</td>
+        </tr>
+        <tr>
+          <th scope="row">客诉率</th>
+          <td>1.5%</td>
+          <td>≤ 2%</td>
+          <td class="threshold">&gt; 2% 连续 3 日</td>
+          <td>质检主管</td>
+          <td>每日</td>
+          <td>连续 3 日 &gt; 2%</td>
+          <td class="action">回退该问题类型至人工处理</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 4. 风险与预案 -->
+  <section>
+    <h2>风险与预案</h2>
+    <p class="subtitle">三类风险：质量 / 进度 / 组织。每类对应监控指标与纠偏动作。</p>
+    <table>
+      <caption>表 2 · 风险审计矩阵</caption>
+      <thead>
+        <tr>
+          <th scope="col">风险类型</th>
+          <th scope="col">风险点</th>
+          <th scope="col">监控指标</th>
+          <th scope="col">纠偏动作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">质量风险</th>
+          <td>AI 错答导致客诉上升</td>
+          <td>每日客诉率</td>
+          <td class="action">客诉率 &gt; 2% 时回退该问题类型至人工</td>
+        </tr>
+        <tr>
+          <th scope="row">进度风险</th>
+          <td>知识库搭建延迟</td>
+          <td>周完成工单类型数</td>
+          <td class="action">延迟 &gt; 1 周时缩减 Phase 1 覆盖范围</td>
+        </tr>
+        <tr>
+          <th scope="row">组织风险</th>
+          <td>客服团队抵触转型</td>
+          <td>月度离职率</td>
+          <td class="action">离职率 &gt; 10% 时启动转岗激励方案</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 5. 30 秒口播 + 脚注 -->
+  <footer class="wrap">
+    <h2>30 秒口播摘要</h2>
+    <p class="pitch">
+      我们面临的是一个硬约束问题：成本砍 30%，CSAT 不能掉。我主推分层部署，第一月让 AI 只做 Top 5 的标准件，占 40% 工单，人工全程兜底；第二到第三个月扩到 Top 15，覆盖 65%。
+      四个指标每周看：AI 解决率、CSAT、人力成本、客诉率；任何一项跌破阈值都有明确纠偏动作，不靠拍脑袋。
+      若 AI 解决率连续两周低于 50%，我立刻切到备选——外包加 AI 辅助，成本节省收窄但风险可控。
+    </p>
+    <p class="refs">
+      证据：本方案遵循"先业务问题后技术方案"原则 <code>[S01]</code>，业务抉择基于"价值产出、资源效率、执行可控性"三维判定 <code>[S01][S10]</code>，团队过渡参考"找对人、分好钱、责任边界"框架 <code>[S01][S08][S11]</code>。完整源索引见 <code>rag/source_index_v1.md</code>。
+    </p>
+  </footer>
+
+</body>
+</html>
